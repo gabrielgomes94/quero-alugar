@@ -1,0 +1,55 @@
+version: "3"
+
+services:
+  db:
+    image: postgres:14.2
+    environment:
+      POSTGRES_DB: quero_alugar_development
+      POSTGRES_USER: gabriel
+      POSTGRES_PASSWORD: password
+    ports:
+      - '5432:5432'
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
+    volumes:
+      - .:/opt/app
+    env_file: .env
+    environment:
+      RAILS_ENV: development
+    ports:
+      - '3000:3000'
+    depends_on:
+      - db
+      - redis
+    tty: true
+    stdin_open: true
+
+  redis:
+      image: redis:6.2.7
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    depends_on:
+      - app
+      - db
+      - redis
+    volumes:
+      - .:/opt/app
+    env_file: .env
+    environment:
+      RAILS_ENV: development
+    entrypoint: ./docker/entrypoints/sidekiq-entrypoint.sh
+    tty: true
+    stdin_open: true
+
+volumes:
+  db-data:
+    external: false
