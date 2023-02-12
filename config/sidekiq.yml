@@ -1,0 +1,14 @@
+:concurrency: 5
+:queues:
+  - default
+  - low_priority
+
+:timeout: 8
+
+:verbose: true
+
+:logfile: log/sidekiq.log
+
+:log_level: info
+
+:port: 3032
