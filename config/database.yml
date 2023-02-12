@@ -20,6 +20,9 @@ default: &default
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  username: <%= ENV.fetch("POSTGRES_USER") %>
+  password: <%= ENV.fetch("POSTGRES_PASSWORD") %>
+  host: <%= ENV.fetch("DATABASE_HOST") %>
 
 development:
   <<: *default
@@ -41,7 +44,7 @@ development:
 
   # The TCP port the server listens on. Defaults to 5432.
   # If your server runs on a different port number, change accordingly.
-  #port: 5432
+  port: 5432
 
   # Schema search path. The server defaults to $user,public
   #schema_search_path: myapp,sharedapp,public
@@ -81,6 +84,6 @@ test:
 #
 production:
   <<: *default
-  database: quero_alugar_production
-  username: quero_alugar
-  password: <%= ENV["QUERO_ALUGAR_DATABASE_PASSWORD"] %>
+#  database: quero_alugar_production
+#  username: quero_alugar
+#  password: <%#= ENV["QUERO_ALUGAR_DATABASE_PASSWORD"] %>
