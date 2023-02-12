@@ -60,4 +60,9 @@ EXPOSE 3000
 # Start rails server
 CMD ["rails", "s", "-b", "0.0.0.0"]
 
-USER $USER
+# Create appuser with GID 998 (the same as the docker group)
+RUN addgroup --gid 998 appgroup && \
+    adduser --system --no-create-home --disabled-password --uid 1000 --gid 998  appuser
+
+# Set the default user for the container
+USER appuser

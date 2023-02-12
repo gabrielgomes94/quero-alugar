@@ -11,17 +11,21 @@ services:
       - '5432:5432'
     volumes:
       - db-data:/var/lib/postgresql/data
+    networks:
+      - queroalugar
 
   app:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3000 -b '0.0.0.0'"
     volumes:
       - .:/opt/app
+    working_dir: /opt/app
     env_file: .env
     environment:
       RAILS_ENV: development
+      POSTGRES_USER: gabriel
+      POSTGRES_PASSWORD: password
     ports:
       - '3000:3000'
     depends_on:
@@ -29,9 +33,13 @@ services:
       - redis
     tty: true
     stdin_open: true
+    networks:
+      - queroalugar
 
   redis:
-      image: redis:6.2.7
+    image: redis:6.2.7
+    networks:
+      - queroalugar
 
   sidekiq:
     build:
@@ -43,13 +51,24 @@ services:
       - redis
     volumes:
       - .:/opt/app
+    ports:
+      - '3032:3032'
     env_file: .env
     environment:
       RAILS_ENV: development
+      POSTGRES_USER: gabriel
+      POSTGRES_PASSWORD: password
     entrypoint: ./docker/entrypoints/sidekiq-entrypoint.sh
     tty: true
     stdin_open: true
+    networks:
+      - queroalugar
+
+networks:
+  queroalugar:
+    driver: bridge
 
 volumes:
   db-data:
+    driver: local
     external: false
